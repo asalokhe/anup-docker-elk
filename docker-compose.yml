@@ -19,6 +19,8 @@ services:
       - "9300:9300"
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      # Use single node discovery in order to disable production mode and avoid bootstrap checks.
+      # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
       discovery.type: "single-node"
       ELASTIC_PASSWORD: changeme
     networks:
@@ -38,9 +40,13 @@ services:
         source: C:\Installed Software\volumes\logstash\pipeline
         target: /usr/share/logstash/pipeline
         read_only: true
+      - type: bind
+        source: C:\Installed Software\volumes\logstash\jars\activemq-all-5.16.3.jar
+        target: /opt/activemq-all-5.16.3.jar
+        read_only: false
     ports:
-      - "5000:5000"
-      - "9600:9600"
+      - "5000:5000" #"5000:5000/tcp" or "5000:5000/udp"
+      - "9600:9600" 
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
@@ -64,6 +70,53 @@ services:
         - elk
       depends_on: # Express dependency between services
         - elasticsearch
+  
+  activemq:
+    build:
+      context: activemq/
+    #volumes:
+    #  - type: bind
+    #    source: C:\Installed Software\volumes\activemq\config
+    #    target: /opt/activemq/conf
+    #    read_only: false
+    #  - type: bind
+    #    source: C:\Installed Software\volumes\activemq\data
+    #    target: /data/activemq
+    #    read_only: false
+    #  - type: bind
+    #    source: C:\Installed Software\volumes\activemq\log
+    #    target: /var/log/activemq
+    #    read_only: false
+    ports:
+        # mqtt
+        - "1883:1883"
+        # amqp
+        - "5672:5672"
+        # ui
+        - "8161:8161"
+        # stomp
+        - "61613:61613"
+        # ws
+        - "61614:61614"
+        # jms
+        - "61616:61616"
+    #environment:
+      #ACTIVEMQ_REMOVE_DEFAULT_ACCOUNT: "true"
+      #ACTIVEMQ_ADMIN_LOGIN: admin
+      #ACTIVEMQ_ADMIN_PASSWORD: password
+      #ACTIVEMQ_WRITE_LOGIN: write
+      #ACTIVEMQ_WRITE_PASSWORD: password
+      #ACTIVEMQ_READ_LOGIN: read
+      #ACTIVEMQ_READ_PASSWORD: password
+      #ACTIVEMQ_JMX_LOGIN: jmx
+      #ACTIVEMQ_JMX_PASSWORD: password
+      #ACTIVEMQ_STATIC_TOPICS: static-topic-1;static-topic-2
+      #ACTIVEMQ_STATIC_QUEUES: static-queue-1;static-queue-2
+      #ACTIVEMQ_ENABLED_SCHEDULER: "true"
+      #ACTIVEMQ_MIN_MEMORY: 512
+      #ACTIVEMQ_MAX_MEMORY: 2048
+    networks:
+        - elk
 networks:
   elk:
 
