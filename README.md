@@ -64,9 +64,13 @@ JMS dependency + push the message in the required queue.
     </dependency>
 
 ########################################################################################################################################
+## Verification
+1. After installation of elk stack and active mq using docker-compose up
+2. Run the application "mule-mq-demo" and test; GET: http://localhost:8081/amq to ingest logs via jms.
+3. Run the application "mule-jms-demo" and test; GET: http://localhost:8081/elk-demo to ingest console logs using log4j2.xml appender 
 
+########################################################################################################################################
 ## References:
-
 1. https://www.elastic.co/guide/index.html
 2. https://www.elastic.co/guide/en/logstash/current/index.html
 3. You can disable CloudHub logs and integrate your CloudHub application with your logging system by using the Log4j configuration. After you configure logs to flow to both your log system and CloudHub, disable the default CloudHub application logs. 
