@@ -1,4 +1,6 @@
 ---
+# Contains Logstash configuration flags. You can set flags in this file instead of passing the flags at the command line. 
+# Any flags that you set at the command line override the corresponding settings in the logstash.yml file.
 ## Default Logstash configuration from Logstash base image.
 ## https://github.com/elastic/logstash/blob/master/docker/data/logstash/config/logstash-full.yml
 #

@@ -6,6 +6,7 @@ services:
       context: elasticsearch/
       args:
         ELK_VERSION: "7.16.2"
+    container_name: elasticsearch
     volumes:
       - type: bind
         source: C:\Installed Software\volumes\elasticsearch\config\elasticsearch.yml
@@ -31,11 +32,14 @@ services:
       context: logstash/
       args:
         ELK_VERSION: "7.16.2"
+    container_name: logstash    
     volumes:
+      # Configuration files in "config" directory, including logstash.yml and jvm.options
       - type: bind
         source: C:\Installed Software\volumes\logstash\config\logstash.yml
         target: /usr/share/logstash/config/logstash.yml
         read_only: true
+      # Logstash pipeline configuration files
       - type: bind
         source: C:\Installed Software\volumes\logstash\pipeline
         target: /usr/share/logstash/pipeline
@@ -59,6 +63,7 @@ services:
         context: kibana/
         args:
           ELK_VERSION: "7.16.2"
+      container_name: kibana
       volumes:
         - type: bind
           source: C:\Installed Software\volumes\kibana\config\kibana.yml
@@ -74,19 +79,20 @@ services:
   activemq:
     build:
       context: activemq/
-    #volumes:
-    #  - type: bind
+    container_name: activemq
+    volumes:
+    #  - type: bind # Not working
     #    source: C:\Installed Software\volumes\activemq\config
     #    target: /opt/activemq/conf
     #    read_only: false
-    #  - type: bind
-    #    source: C:\Installed Software\volumes\activemq\data
-    #    target: /data/activemq
-    #    read_only: false
-    #  - type: bind
-    #    source: C:\Installed Software\volumes\activemq\log
-    #    target: /var/log/activemq
-    #    read_only: false
+      - type: bind
+        source: C:\Installed Software\volumes\activemq\data
+        target: /data/activemq
+        read_only: false
+      - type: bind
+        source: C:\Installed Software\volumes\activemq\log
+        target: /var/log/activemq
+        read_only: false
     ports:
         # mqtt
         - "1883:1883"
@@ -100,7 +106,7 @@ services:
         - "61614:61614"
         # jms
         - "61616:61616"
-    #environment:
+    environment:
       #ACTIVEMQ_REMOVE_DEFAULT_ACCOUNT: "true"
       #ACTIVEMQ_ADMIN_LOGIN: admin
       #ACTIVEMQ_ADMIN_PASSWORD: password
@@ -108,13 +114,13 @@ services:
       #ACTIVEMQ_WRITE_PASSWORD: password
       #ACTIVEMQ_READ_LOGIN: read
       #ACTIVEMQ_READ_PASSWORD: password
-      #ACTIVEMQ_JMX_LOGIN: jmx
-      #ACTIVEMQ_JMX_PASSWORD: password
-      #ACTIVEMQ_STATIC_TOPICS: static-topic-1;static-topic-2
-      #ACTIVEMQ_STATIC_QUEUES: static-queue-1;static-queue-2
-      #ACTIVEMQ_ENABLED_SCHEDULER: "true"
-      #ACTIVEMQ_MIN_MEMORY: 512
-      #ACTIVEMQ_MAX_MEMORY: 2048
+      ACTIVEMQ_JMX_LOGIN: jmx
+      ACTIVEMQ_JMX_PASSWORD: password
+      ACTIVEMQ_STATIC_TOPICS: static-topic-1;static-topic-2
+      ACTIVEMQ_STATIC_QUEUES: static-queue-1;static-queue-2
+      ACTIVEMQ_ENABLED_SCHEDULER: "true"
+      ACTIVEMQ_MIN_MEMORY: 512
+      ACTIVEMQ_MAX_MEMORY: 2048
     networks:
         - elk
 networks:
