@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="bb3610ac-559e-4790-a2a6-0a92694c20de" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="cbb6b3aa-bb69-4f01-ac47-e4ecd5139f56" file="mule-elk-demo-config.yaml" />
+	<flow name="mule-elk-demoFlow" doc:id="7f4cbddb-98df-40b9-8b14-cda5351e48e0" >
+		<http:listener doc:name="/elk-demo" doc:id="213bbb62-e3ed-463c-bb0c-5bc6a006063d" config-ref="HTTP_Listener_config" path="/elk-demo"/>
+		<logger level="INFO" doc:name="Input Logger" doc:id="34c7e32e-ca29-4819-9ddb-a578662d6b64" message='#["\nInside Mule ELK Demo Project"]'/>
+		<ee:transform doc:name="Transform Response Message" doc:id="61d6b3f6-08b5-4f38-a602-965c307e296b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "message form mule-elk-demo @: " ++ now()
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Response Logger" doc:id="88f1bf33-f448-4b01-9a34-4623d8a9d1b7" message='#["Response Out Logger: " ++ write(payload default "")]'/>
+	</flow>
+</mule>

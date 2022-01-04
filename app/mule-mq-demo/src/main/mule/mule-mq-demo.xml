@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="ea7f728f-0374-42aa-88a1-ca0e3cbcf43c" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<jms:config name="JMS_Config" doc:name="JMS Config" doc:id="8301582d-c8a3-4da4-adb1-c3546819cec9" >
+		<jms:active-mq-connection username="admin" password="admin" >
+			<jms:factory-configuration brokerUrl="tcp://localhost:61616" />
+		</jms:active-mq-connection>
+	</jms:config>
+	<json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="92570dd7-6bf9-45fd-98c9-1b628a8fb1cb" prettyPrint="false"/>
+	<configuration-properties doc:name="Configuration properties" doc:id="c804daff-414e-47fb-8574-965e04f7f3d5" file="mule-mq-demo-config.yaml" />
+	<flow name="mule-mq-demoFlow" doc:id="2b2de723-26f6-4ff2-bc8b-783ede917b76" >
+		<http:listener doc:name="/amq" doc:id="4b0e3220-5efe-4235-bf7e-0fb54cb5d38d" config-ref="HTTP_Listener_config" path="/amq"/>
+		<json-logger:logger doc:name="Logger" doc:id="d79f5d47-0df6-4bc4-9488-32722df0bd68" config-ref="JSON_Logger_Config" message='#["Input Logger"]'/>
+		<ee:transform doc:name="Transform Message" doc:id="b2dc3591-e193-4ba5-af19-085730b927e2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Hello from Mule-mq-demo project @: " ++ now()
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<jms:publish doc:name="Publish" doc:id="08bf9185-e487-4892-a0eb-a149869f8887" config-ref="JMS_Config" destination="TestQ"/>
+	</flow>
+</mule>

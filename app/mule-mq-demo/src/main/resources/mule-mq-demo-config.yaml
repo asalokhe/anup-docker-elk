@@ -1,0 +1,8 @@
+json:
+  logger:
+    application:
+      name: "mule-mq-demo"
+      version: "1.0.0"
+      
+mule:
+  env: "dev"
